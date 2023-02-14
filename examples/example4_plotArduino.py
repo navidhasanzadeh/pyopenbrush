@@ -9,20 +9,20 @@ ob = OpenBrush()
 
 def thread_function():
     ser = serial.Serial('/dev/ttyACM1', 9600, timeout=.1)
-    time.sleep(1)
+    time.sleep(0.2)
     ser.read_all()
-    c = []
+    c = [6,10]
     while True:
         try:
-            b = int(ser.readlines()[-1].strip()) / 30
-            b = np.min([1,b])            
-            c.append(b)
-            c = c[-5:]
-            color = np.median(c)
-            ob.colorSetRGB([color, 0 , 1-color])   
+            b = int(ser.readlines()[-1].strip())
+            b = np.min([b, 15])
+            c.append(b)            
+            color = np.mean(c[-5:])
+            color = (color - np.min(c)) / (np.max(c) - np.min(c))
+            ob.colorSetRGB([color, 0, 1-color])               
         except:
             pass
-        time.sleep(0.2)    
+        time.sleep(0.1)    
 
 
 x = threading.Thread(target=thread_function)
@@ -36,7 +36,7 @@ ob.userMoveTo([0,0,20])
 ob.brushType("smoke")
 
 x = 0
-X = [[0,0,0]]*10
+X = [[0,0,0]] * 20
 while True:
     try:
         x = x + 1
@@ -48,4 +48,4 @@ while True:
         X = X[1:]
     except:
         pass
-    time.sleep(0.1)
+    time.sleep(0.05)
